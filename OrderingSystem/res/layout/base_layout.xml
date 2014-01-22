@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:myattr="http://schemas.android.com/apk/res/com.caferestaurant.orderingsystem.app"
+    android:id="@+id/body"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/top_bgs"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    
+    <com.caferestaurant.orderingsystem.app.view.TestViewWaterfall
+        android:id="@+id/testtest"
+        android:layout_width="fill_parent" 
+        android:layout_height="fill_parent" 
+        myattr:flowNumber="2" /> 
+    
+    
+    
+</LinearLayout>
