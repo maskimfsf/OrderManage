@@ -50,13 +50,17 @@ containing a value of this type.
     }
     public static final class id {
         public static final int body=0x7f070000;
-        public static final int ico_price=0x7f070005;
-        public static final int img=0x7f070002;
-        public static final int info=0x7f070003;
-        public static final int like=0x7f070007;
-        public static final int price=0x7f070006;
-        public static final int price_lay=0x7f070004;
-        public static final int testtest=0x7f070001;
+        public static final int ico_price=0x7f070009;
+        public static final int img=0x7f070006;
+        public static final int info=0x7f070007;
+        public static final int like=0x7f07000b;
+        public static final int price=0x7f07000a;
+        public static final int price_lay=0x7f070008;
+        public static final int testtest=0x7f070002;
+        public static final int testtest1=0x7f070003;
+        public static final int testtest2=0x7f070004;
+        public static final int testtest3=0x7f070005;
+        public static final int view5=0x7f070001;
     }
     public static final class layout {
         public static final int base_layout=0x7f030000;
@@ -133,7 +137,7 @@ containing a value of this type.
 
           <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
-          @attr name android:buttonBarButtonStyle
+          @attr name com.caferestaurant.orderingsystem.app:buttonBarButtonStyle
         */
         public static final int ButtonBarContainerTheme_buttonBarButtonStyle = 1;
         /**
@@ -143,7 +147,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
 
           <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
-          @attr name android:buttonBarStyle
+          @attr name com.caferestaurant.orderingsystem.app:buttonBarStyle
         */
         public static final int ButtonBarContainerTheme_buttonBarStyle = 0;
         /** Attributes that can be used with a WaterfallLayout.
@@ -170,7 +174,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
 theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
-          @attr name android:flowNumber
+          @attr name com.caferestaurant.orderingsystem.app:flowNumber
         */
         public static final int WaterfallLayout_flowNumber = 0;
     };

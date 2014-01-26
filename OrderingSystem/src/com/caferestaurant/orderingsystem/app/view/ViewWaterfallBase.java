@@ -1,6 +1,7 @@
 package com.caferestaurant.orderingsystem.app.view;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,9 @@ import android.view.View;
  * 参照TestViewWaterfall类的实现
  * @author wangji
  *
+ * 注意!!!
+ * ViewBase派生的情况下必须重写OnLayout!!!
+ * 并自己实现所有功能！！！
  */
 public abstract class ViewWaterfallBase extends ViewBase{
 
@@ -28,6 +32,12 @@ public abstract class ViewWaterfallBase extends ViewBase{
 
 	private WaterfallLayout waterfall;
 	
+	/**
+	 * 1.生成内部的waterfall layout
+	 * 2.将内部layout设置为充满并置为本视图的父控件
+	 * 3.设定第一次更新的事件处理以及滚动到底部的事件处理
+	 * @param context
+	 */
 	private void init(Context context)
 	{
 		this.setInflater(LayoutInflater.from(context));
@@ -60,9 +70,16 @@ public abstract class ViewWaterfallBase extends ViewBase{
 		this.waterfall.addViewToIndexFlow(v, this.waterfall.getShortestFlowIndex());
 	}
 	
-	abstract void onDrawStart(View t);
+	/**
+	 * 首次渲染开始事件处理
+	 */
+	protected abstract void onDrawStart(View t);
 	
-	abstract void onGotoBottom(View t);
+	/*
+	 * 滚动到底部的事件处理
+	 */
+	protected abstract void onGotoBottom(View t);
+	
 	
 	protected void setDataFinished()
 	{
@@ -78,7 +95,13 @@ public abstract class ViewWaterfallBase extends ViewBase{
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
 		if (changed)
 		{
-			this.waterfall.layout(l, t, r, b);
+			this.setLeft(l);
+			this.setTop(t);
+			this.setRight(r);
+			this.setBottom(b);
+
+			// 由于l t r b是本view相对于parent的坐标，所以需要调整到原点(l,t)
+			this.waterfall.layout(l - l, t - t, r - l, b - t);
 		}
 	}
 

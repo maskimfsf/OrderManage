@@ -15,10 +15,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -90,6 +87,8 @@ public class WaterfallLayout extends ScrollView {
 	 * 滑动到底部的监听器接口
 	 * 在滚动到底部时触发此监听器
 	 * 本监听器仅仅被触发一次
+	 * 本监听器必然在主线程（界面更新线程）中被调用
+	 * 是否需要改？？？
 	 */
 	public interface ScrollToBottomListener
 	{
@@ -103,7 +102,7 @@ public class WaterfallLayout extends ScrollView {
 	}
 	
 	/**
-	 * 是否界面的所有数据已经加载完毕
+	 * 是否界面的“所有”数据已经加载完毕
 	 */
 	private boolean isLoadingFinished = false;
 	
@@ -120,7 +119,10 @@ public class WaterfallLayout extends ScrollView {
 	}
 	
 	/**
-	 * 是否界面的所有数据正在加载中
+	 * 是否界面的数据正在加载中
+	 * 如果正在加载中
+	 * 1.再一次滚动到底部的事件不会被触发
+	 * 2.界面底部的“正在更新”字幕被显示
 	 */
 	private boolean isLoadingProcess = false;
 	
@@ -138,6 +140,10 @@ public class WaterfallLayout extends ScrollView {
 		
 	}
 
+	/**
+	 * 基本构造函数
+	 * 缺省的列数为2
+	 */
 	public WaterfallLayout(Context context) {
 		super(context);
 		
@@ -158,6 +164,7 @@ public class WaterfallLayout extends ScrollView {
 		super(context, attrs, defStyle);
 		
 		// 自定义属性，取得列数
+		// (如果仅仅)
 		TypedArray a = context.obtainStyledAttributes(attrs,R.styleable.WaterfallLayout); 
 		int flowNum = a.getInt(R.styleable.WaterfallLayout_flowNumber, DEFAULT_WATERFALL_NUM); 
 		a.recycle();
@@ -165,16 +172,29 @@ public class WaterfallLayout extends ScrollView {
 		this.createInnerViews(flowNum, context);
 	}
 	
+	/**
+	 * 取得某一列的流布局
+	 * 流布局的下表为0~N-1
+	 */
 	public LinearLayout getFlow(int idx)
 	{
 		return this.flowLayout.get(idx);
 	}
 	
+	/**
+	 * 取得流的总数
+	 */
 	public int getFlowCount()
 	{
 		return this.flowLayout.size();
 	}
 
+	/**
+	 * 内部构造
+	 * 1.构造出N个数量的流
+	 * 2.构造出底部的更新字幕
+	 * 3.
+	 */
 	private void createInnerViews(int flowNumber, Context context)
 	{
 		this.flowLength = new int[flowNumber];
@@ -198,7 +218,7 @@ public class WaterfallLayout extends ScrollView {
 			// 仅供测试
 			DummyView dv = new DummyView(context);
 			dv.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 1));
-			dv.setBackgroundColor(Color.RED);
+			dv.setBackgroundColor(Color.BLACK);
 			inVertical.addView(dv);
 			
 			this.flowLayout.add(inVertical);
@@ -232,6 +252,11 @@ public class WaterfallLayout extends ScrollView {
 		this.root = llVertical;
 	}
 
+	/**
+	 * 重绘函数
+	 * 如果是第一次绘制的话，需要将流布局的横方向LayoutParams指定为固定值（防止加入View的时候改变其列宽）
+	 * 并调用首次绘制的回调方法
+	 */
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
@@ -255,12 +280,18 @@ public class WaterfallLayout extends ScrollView {
 	}
 	
 
+	/**
+	 * 设定更新消息的可见性
+	 * @param v
+	 */
 	public void setMessageViewVisible(boolean v)
 	{
 		this.messageView.setVisibility((v == true) ? View.VISIBLE : View.INVISIBLE);
 	}
 	
-	
+	/**
+	 * 取得最短的流下标
+	 */
 	public int getShortestFlowIndex()
 	{	
 		int shortestIdx = 0;
@@ -275,6 +306,9 @@ public class WaterfallLayout extends ScrollView {
 		return shortestIdx;
 	}
 	
+	/**
+	 * 取得最长的流下标
+	 */
 	public int getLongestFlowIndex()
 	{	
 		int longestIdx = 0;
@@ -290,6 +324,10 @@ public class WaterfallLayout extends ScrollView {
 	}
 	
 	
+	/**
+	 * 大小衡量
+	 * 由于从ScrollView派生，所以无需自己调用各个子视图的onMeasure
+	 */
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -300,6 +338,12 @@ public class WaterfallLayout extends ScrollView {
 		}
 	}
 
+	/**
+	 * 将v添加到下标为i的流布局中
+	 * 不管v的大小参数如何，流布局的宽度不会改变
+	 * 在将v添加到布局后，框架将调用measure和layout以使得视图宽高自动计算
+	 * 调用方不需要自己调用任何调整
+	 */
 	public void addViewToIndexFlow(View v, int i)
 	{
 		if (i > this.flowLayout.size())
@@ -314,6 +358,13 @@ public class WaterfallLayout extends ScrollView {
 	}
 
 
+	/**
+	 * 监听scroll事件
+	 * 下列条件同时满足的话将触发scroll到底部事件
+	 * 1.没有把所有数据Load完（isLoadingFinished）
+	 * 2.当前不处于load阶段（isLoadingProcess）
+	 * 3.滚动到底部（不包括加载字幕）
+	 */
 	@Override
 	protected void onScrollChanged(int l, int t, int oldl, int oldt) {
 		
@@ -335,11 +386,8 @@ public class WaterfallLayout extends ScrollView {
 						Log.e("onScrollChanged", "calling onScrollToBottom");
 						this.scrollToBottomListener.onScrollToBottom(this);
 					}
-					
 				}
 			}
 		}
 	}
-	
-	
 }

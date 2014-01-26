@@ -252,6 +252,7 @@ public class ScrollLayout extends ViewGroup {
 	public int getCurScreen() {
 		return this.mCurScreen;
 	}
+	
 
 	/**
 	 * ¼ÆËã¹ö¶¯

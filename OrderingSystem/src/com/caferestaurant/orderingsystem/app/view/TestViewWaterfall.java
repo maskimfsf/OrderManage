@@ -1,6 +1,7 @@
 package com.caferestaurant.orderingsystem.app.view;
 
 import com.caferestaurant.orderingsystem.app.R;
+import com.caferestaurant.orderingsystem.app.util.ViewUtility;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -19,12 +20,12 @@ public class TestViewWaterfall extends ViewWaterfallBase{
 	}
 
 	@Override
-	void onDrawStart(View t) {
+	protected void onDrawStart(View t) {
 		this.addSomeImages();
 	}
 
 	@Override
-	void onGotoBottom(View t) {
+	protected void onGotoBottom(View t) {
 		this.addSomeImages();
 		this.setLoadingFinished();
 	}
@@ -52,8 +53,13 @@ public class TestViewWaterfall extends ViewWaterfallBase{
 			iv = (ImageView)inner.findViewById(R.id.img);
 			iv.setImageResource(R.drawable.weng4);
 			this.addViewToWaterfall(inner);
+			
+			
+			inner = ViewUtility.getViewForWaterfallFromResource(R.layout.tile_view, inf);
+			iv = (ImageView)inner.findViewById(R.id.img);
+			iv.setImageResource(R.drawable.weng6);
+			this.addViewToWaterfall(inner);
 		}
-		
 	}
 
 	@Override
